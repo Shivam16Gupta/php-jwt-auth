@@ -72,7 +72,9 @@ else :
                 // DATA BINDING
                 $insert_stmt->bindValue(':name', htmlspecialchars(strip_tags($name)), PDO::PARAM_STR);
                 $insert_stmt->bindValue(':email', $email, PDO::PARAM_STR);
-                $insert_stmt->bindValue(':password', password_hash($password, PASSWORD_DEFAULT), PDO::PARAM_STR);
+                // UNCOMMENT TO STORE ENCRYPTED PASSWORD
+                //$insert_stmt->bindValue(':password', password_hash($password, PASSWORD_DEFAULT), PDO::PARAM_STR);
+                $insert_stmt->bindValue(':password', $password, PDO::PARAM_STR);
 
                 $insert_stmt->execute();
 
