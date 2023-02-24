@@ -28,39 +28,45 @@ if ($_SERVER["REQUEST_METHOD"] != "POST") :
 
 elseif (
     !isset($data->quizid)
-    || !isset($data->email)
-    || !isset($data->response)
-    || empty(trim($data->email))
+    ||!isset($data->email)
+    ||!isset($data->unattempted)
+    || !isset($data->review)
+    || !isset($data->answered)
+    || !isset($data->score)
+    ||empty($data->email)
 ) :
+    echo($data->quizid);
     echo($data->email);
-    //echo(json_encode($data->response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-    $response = json_encode($data->response);
-    //$escaped_response=$conn->quote($response,PDO::PARAM_STR);
-    echo(var_dump($response));
-    //echo(var_dump($escaped_response));
-    echo($response);
-    //echo($escaped_response);
-    $fields = ['fields' => ['quizid','email', 'response']];
+    echo($data->unattempted);
+    echo($data->review);
+    echo($data->answered);
+    echo($data->score);
+    
+    $fields = ['fields' => ['quizid','email','unattempted','review', 'answered','score']];
     $returnData = msg(0, 422, 'Please Fill in all Required Fields!', $fields);
 
 // IF THERE ARE NO EMPTY FIELDS THEN-
 else :
     $quizid=trim($data->quizid);
     $email=trim($data->email);
-    //$response=array_map('utf8_encode',$data->response);
-    $response = json_encode($data->response);
-    //$escaped_response=$conn->quote($response,PDO::PARAM_STR);
+    $unattempted=trim($data->unattempted);
+    $review=trim($data->review);
+    $answered=trim($data->answered);
+    $score=trim($data->score);
     
         try {
-                $insert_query = "INSERT INTO `score`(`quizid`,`email`,`data`) VALUES(:quizid,:email,:data)";
+                $insert_query = "INSERT INTO `performance`(`quizid`,`email`,`answered`,`review`,`unattempted`,`score`) VALUES(:quizid,:email,:answered,:review,:unattempted,:score)";
 
                 $insert_stmt = $conn->prepare($insert_query);
                 $insert_stmt->bindValue(':quizid', $quizid, PDO::PARAM_STR);
                 $insert_stmt->bindValue(':email', $email, PDO::PARAM_STR);
-                $insert_stmt->bindValue(':data', $response,PDO::PARAM_STR);
+                $insert_stmt->bindValue(':answered', $answered,PDO::PARAM_STR);
+                $insert_stmt->bindValue(':review', $review, PDO::PARAM_STR);
+                $insert_stmt->bindValue(':unattempted', $unattempted, PDO::PARAM_STR);
+                $insert_stmt->bindValue(':score', $score,PDO::PARAM_STR);
                 
                 $insert_stmt->execute();
-                $returnData = msg(1, 201, 'You have successfully submitted the test.');
+                $returnData = msg(1, 201, 'Performace Recorded');
 
             
         } catch (PDOException $e) {
