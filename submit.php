@@ -18,6 +18,12 @@ function msg($success, $status, $message, $extra = [])
     ], $extra);
 }
 
+// VISITING USER SYSTEM INFO
+$ip_address = $_SERVER["REMOTE_ADDR"]; 
+date_default_timezone_set('Asia/Kolkata');
+        $date = date("Y-m-d");
+        $time = date("H:i:s");
+
 // DATA FORM REQUEST
 $data = json_decode(file_get_contents("php://input"));
 $returnData = [];
@@ -52,12 +58,15 @@ else :
     //$escaped_response=$conn->quote($response,PDO::PARAM_STR);
     
         try {
-                $insert_query = "INSERT INTO `score`(`quizid`,`email`,`data`) VALUES(:quizid,:email,:data)";
+                $insert_query = "INSERT INTO `score`(`quizid`,`email`,`data`,`date`,`time`,`ip`) VALUES(:quizid,:email,:data,:date,:time,:ip)";
 
                 $insert_stmt = $conn->prepare($insert_query);
                 $insert_stmt->bindValue(':quizid', $quizid, PDO::PARAM_STR);
                 $insert_stmt->bindValue(':email', $email, PDO::PARAM_STR);
                 $insert_stmt->bindValue(':data', $response,PDO::PARAM_STR);
+                $insert_stmt->bindValue(':date', $date, PDO::PARAM_STR);
+                $insert_stmt->bindValue(':time', $time, PDO::PARAM_STR);
+                $insert_stmt->bindValue(':ip', $ip_address,PDO::PARAM_STR);
                 
                 $insert_stmt->execute();
                 $returnData = msg(1, 201, 'You have successfully submitted the test.');

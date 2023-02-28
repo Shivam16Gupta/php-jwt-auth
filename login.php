@@ -18,6 +18,7 @@ function msg($success,$status,$message,$extra = []){
 
 $db_connection = new Database();
 $conn = $db_connection->dbConnection();
+// echo(json_encode(getallheaders()));
 
 $data = json_decode(file_get_contents("php://input"));
 $returnData = [];

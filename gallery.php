@@ -22,7 +22,7 @@ function msg($success, $status, $message, $extra = [])
 }
 
 // FETCH INPUT FROM CLIENT
-$data = json_decode(file_get_contents("php://input"));
+
 $returnData=[];
 //echo($data->email);
 //
@@ -30,22 +30,11 @@ if ($_SERVER["REQUEST_METHOD"] != "POST") :
 
     $returnData = msg(0, 404, 'Page Not Found!');
 
-elseif (
-    !isset($data->email)
-    || empty(trim($data->email))
-) :
-    echo (json_encode($data->email));
-
-    $fields = ['fields' => ['email']];
-    $returnData = msg(0, 422, 'Please Fill in all Required Fields!', $fields);
-
-else :
-
-    $email = trim($data->email);
+else:
     
     //FETCH QUIZ INFO
     try {
-        $fetchQuery = "SELECT * FROM `quizinfo` WHERE host='1' AND (quizid NOT IN (SELECT quizid FROM `score` WHERE email='" . $email . "'))";
+        $fetchQuery = "SELECT * FROM `quizinfo` WHERE host=1 ";
         $query_stmt = $conn->prepare($fetchQuery);
         $query_stmt->execute();
         $returnData = msg(1, 201, 'You have successfully submitted the test.');
@@ -57,6 +46,6 @@ else :
     echo $returnData;
 endif;
 //CREATE JSON FILE
-$fp = fopen('quizInfo.json', 'w');
+$fp = fopen('gallery.json', 'w');
 fwrite($fp, $returnData);
 fclose($fp);

@@ -14,6 +14,27 @@ class Auth extends JwtHandler
         $this->headers = $headers;
     }
 
+    // public function verifyVersion()
+    // {
+    //     $db = parse_ini_file(dirname(__DIR__) . "/DbProperties.ini");
+    //     $versionMatched = false;
+    //     echo($db);
+    //     if ($role == 'ADMIN') {
+    //         if ($db['admin_app_version'] == $admin_app_version) {
+    //             $versionMatched = true;
+    //         }
+    //     } else {
+    //     if ($db['app_version'] == 1.0) {
+    //         $versionMatched = true;
+    //     }
+    //     //}
+    //     if (!$versionMatched) {
+    //         return false;
+    //     } else {
+    //         return true;
+    //     }
+    // }
+
     public function isValid()
     {
 
@@ -42,6 +63,8 @@ class Auth extends JwtHandler
             ];
         }
     }
+
+    
 
     protected function fetchUser($user_id)
     {

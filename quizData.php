@@ -16,6 +16,7 @@ $req_quiz=json_decode(file_get_contents("php://input"));
 //$quizid=intval($req_quiz);
 $quizid=trim($req_quiz->num);
 //$quizid=json_encode($req_quiz->num);
+
 //FETCH QUIZ DATA
 $fetchQuery="SELECT * FROM `quizbank` WHERE `quizid`='".$quizid."'";
 $query_stmt=$conn->prepare($fetchQuery);
