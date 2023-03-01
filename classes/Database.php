@@ -1,5 +1,5 @@
 <?php
-$db = parse_ini_file(dirname(__DIR__) . "/DbProperties.ini");
+
 
 class Database{
     
@@ -24,13 +24,5 @@ class Database{
           
     }
 
-    function getUserData($data)
-  { 
-    foreach (getallheaders() as $name => $value) {
-      if (strtoupper($name) == strtoupper($data)) {
-        $this->userData =  $value;
-      }
-    }
-    return $this->userData;
-  }
+   
 }

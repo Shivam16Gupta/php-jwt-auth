@@ -1,4 +1,10 @@
 <?php
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: access");
+header("Access-Control-Allow-Methods:  GET, POST");
+header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization,App-Version, X-Requested-With");
+
 require __DIR__ . '/classes/JwtHandler.php';
 
 class Auth extends JwtHandler
@@ -66,7 +72,7 @@ class Auth extends JwtHandler
                     "version"=>$this->ver
                 ];}
             else {
-                echo($this->ver+$db['app_version']);
+                echo($this->ver+" "+$db['app_version']+" "+$data['data']->user_id+" "+$db['app_version']== $this->ver+" "+$this->fetchUser($data['data']->user_id));
                 return [
                     "success" => 0,
                     "message" => "Decode Failed",

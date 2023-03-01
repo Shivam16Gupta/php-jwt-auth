@@ -43,16 +43,7 @@ else:
     $password = trim($data->password);
     error_log($email);
 
-    // CHECKING THE EMAIL FORMAT (IF INVALID FORMAT)
-    if(!filter_var($email, FILTER_VALIDATE_EMAIL)):
-        $returnData = msg(0,422,'Invalid Email Address!');
     
-    // IF PASSWORD IS LESS THAN 8 THE SHOW THE ERROR
-    elseif(strlen($password) < 8):
-        $returnData = msg(0,422,'Your password must be at least 8 characters long!');
-
-    // THE USER IS ABLE TO PERFORM THE LOGIN ACTION
-    else:
         try{
             
             $fetch_user_by_email = "SELECT * FROM `users` WHERE `email`=:email";
@@ -73,7 +64,7 @@ else:
 
                     $jwt = new JwtHandler();
                     $token = $jwt->jwtEncodeData(
-                        'http://localhost/php_auth_api/',
+                        'http://localhost/php-auth-api/',
                         array("user_id"=> $row['id'])
                     );
                     
@@ -99,6 +90,6 @@ else:
 
     endif;
 
-endif;
+
 
 echo json_encode($returnData);
