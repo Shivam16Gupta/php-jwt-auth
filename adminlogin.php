@@ -3,7 +3,7 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: access");
 header("Access-Control-Allow-Methods: POST");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization,App-Version, X-Requested-With");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization,Admin-App-Version, X-Requested-With");
 
 require __DIR__.'/classes/Database.php';
 require __DIR__.'/classes/JwtHandler.php';
@@ -46,7 +46,8 @@ else:
     
         try{
             
-            $fetch_user_by_email = "SELECT * FROM `users` JOIN `profile` ON users.email = profile.email WHERE users.email = :email";
+            //$fetch_user_by_email = "SELECT * FROM `users` JOIN `profile` ON users.email = profile.email WHERE users.email = :email";
+            $fetch_user_by_email = "SELECT * FROM `admin` WHERE email = :email";
             $query_stmt = $conn->prepare($fetch_user_by_email);
             $query_stmt->bindValue(':email', $email,PDO::PARAM_STR);
             $query_stmt->execute();

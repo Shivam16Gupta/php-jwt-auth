@@ -3,7 +3,7 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: access");
 header("Access-Control-Allow-Methods:  GET, POST");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization,App-Version, X-Requested-With");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization,Admin-App-Version, X-Requested-With");
 
 require __DIR__ . '/classes/JwtHandler.php';
 
@@ -47,11 +47,11 @@ class Auth extends JwtHandler
 
         if (array_key_exists('Authorization', $this->headers) && preg_match('/Bearer\s(\S+)/', $this->headers['Authorization'], $matches)) {
             
-            if(array_key_exists('App-Version', $this->headers)){
+            if(array_key_exists('Admin-App-Version', $this->headers)){
 
                 forEach($this->headers as $name=>$value)
                 {
-                    if (strtoupper($name) == "APP-VERSION") {
+                    if (strtoupper($name) == "ADMIN-APP-VERSION") {
                         $this->ver =  $value;
                       }
                 }
@@ -61,7 +61,7 @@ class Auth extends JwtHandler
             //echo(json_encode($data));
             if (
                 isset($data['data']->user_id) &&
-                $db['app_version']== $this->ver &&
+                $db['admin_app_version']== $this->ver &&
                 $user = $this->fetchUser($data['data']->user_id)
                 
             ) {
@@ -92,7 +92,7 @@ class Auth extends JwtHandler
     protected function fetchUser($user_id)
     {  
         try {
-            $fetch_user_by_id = "SELECT * FROM `users` JOIN `profile` ON users.email = profile.email WHERE users.email=:id";
+            $fetch_user_by_id = "SELECT * FROM `admin` WHERE email=:id";
             $query_stmt = $this->db->prepare($fetch_user_by_id);
             $query_stmt->bindValue(':id', $user_id, PDO::PARAM_INT);
             $query_stmt->execute();

@@ -3,7 +3,7 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: access");
 header("Access-Control-Allow-Methods: POST");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization,App-Version, X-Requested-With");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization,Admin-App-Version, X-Requested-With");
 
 require __DIR__ . '/classes/Database.php';
 $db_connection = new Database();
@@ -56,7 +56,7 @@ else :
     else :
         try {
 
-            $check_email = "SELECT `email` FROM `users` WHERE `email`=:email";
+            $check_email = "SELECT `email` FROM `admin` WHERE `email`=:email";
             $check_email_stmt = $conn->prepare($check_email);
             $check_email_stmt->bindValue(':email', $email, PDO::PARAM_STR);
             $check_email_stmt->execute();
@@ -65,16 +65,16 @@ else :
                 $returnData = msg(0, 422, 'This E-mail already in use!');
 
             else :
-                $insert_query = "INSERT INTO `users`(`name`,`email`,`password`) VALUES(:name,:email,:password)";
-                $insert_profile = "INSERT INTO `profile`(`name`,`email`) VALUES(:name,:email)";
+                $insert_query = "INSERT INTO `admin`(`name`,`email`,`password`) VALUES(:name,:email,:password)";
+                //$insert_profile = "INSERT INTO `profile`(`name`,`email`) VALUES(:name,:email)";
                 $insert_stmt = $conn->prepare($insert_query);
-                $insert_profile_stmt = $conn->prepare($insert_profile);
+                //$insert_profile_stmt = $conn->prepare($insert_profile);
                 // DATA BINDING
                 $insert_stmt->bindValue(':name', htmlspecialchars(strip_tags($name)), PDO::PARAM_STR);
                 $insert_stmt->bindValue(':email', $email, PDO::PARAM_STR);
                 // DATA BINDING FOR PROFILE
-                $insert_profile_stmt->bindValue(':name', htmlspecialchars(strip_tags($name)), PDO::PARAM_STR);
-                $insert_profile_stmt->bindValue(':email', $email, PDO::PARAM_STR);
+                //$insert_profile_stmt->bindValue(':name', htmlspecialchars(strip_tags($name)), PDO::PARAM_STR);
+                //$insert_profile_stmt->bindValue(':email', $email, PDO::PARAM_STR);
                 // UNCOMMENT TO STORE ENCRYPTED PASSWORD
                 //$insert_stmt->bindValue(':password', password_hash($password, PASSWORD_DEFAULT), PDO::PARAM_STR);
                 $insert_stmt->bindValue(':password', $password, PDO::PARAM_STR);
