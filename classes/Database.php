@@ -1,28 +1,23 @@
 <?php
 
-
-class Database{
-    
-    // CHANGE THE DB INFO ACCORDING TO YOUR DATABASE
+class Database {
     private $db_host = 'localhost';
     private $db_name = 'quizapp';
     private $db_username = 'root';
     private $db_password = '12345';
-    public $userData = null;
+    private $conn;
 
-    public function dbConnection(){
-        
-        try{
-            $conn = new PDO('mysql:host='.$this->db_host.';dbname='.$this->db_name,$this->db_username,$this->db_password);
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            return $conn;
+    public function dbConnection() {
+        $this->conn = mysqli_connect($this->db_host, $this->db_username, $this->db_password, $this->db_name);
+        if (!$this->conn) {
+            die("Connection failed: " . mysqli_connect_error());
         }
-        catch(PDOException $e){
-            echo "Connection error ".$e->getMessage(); 
-            exit;
-        }
-          
+        return $this->conn;
     }
 
-   
+    public function __destruct() {
+        if ($this->conn) {
+            mysqli_close($this->conn);
+        }
+    }
 }

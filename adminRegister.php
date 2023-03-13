@@ -1,10 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: access");
-header("Access-Control-Allow-Methods: POST");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization,Admin-App-Version, X-Requested-With");
-
+require('appHeaders.php');
 require __DIR__ . '/classes/Database.php';
 $db_connection = new Database();
 $conn = $db_connection->dbConnection();
@@ -23,9 +18,7 @@ $data = json_decode(file_get_contents("php://input"));
 $returnData = [];
 
 if ($_SERVER["REQUEST_METHOD"] != "POST") :
-
     $returnData = msg(0, 404, 'Page Not Found!');
-
 elseif (
     !isset($data->name)
     || !isset($data->email)
@@ -34,59 +27,30 @@ elseif (
     || empty(trim($data->email))
     || empty(trim($data->password))
 ) :
-
     $fields = ['fields' => ['name', 'email', 'password']];
     $returnData = msg(0, 422, 'Please Fill in all Required Fields!', $fields);
-
-// IF THERE ARE NO EMPTY FIELDS THEN-
 else :
-
     $name = trim($data->name);
     $email = trim($data->email);
     $password = trim($data->password);
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) :
         $returnData = msg(0, 422, 'Invalid Email Address!');
-
     elseif (strlen($password) < 8) :
         $returnData = msg(0, 422, 'Your password must be at least 8 characters long!');
-
     elseif (strlen($name) < 3) :
         $returnData = msg(0, 422, 'Your name must be at least 3 characters long!');
-
     else :
-        try {
-
-            $check_email = "SELECT `email` FROM `admin` WHERE `email`=:email";
-            $check_email_stmt = $conn->prepare($check_email);
-            $check_email_stmt->bindValue(':email', $email, PDO::PARAM_STR);
-            $check_email_stmt->execute();
-
-            if ($check_email_stmt->rowCount()) :
-                $returnData = msg(0, 422, 'This E-mail already in use!');
-
-            else :
-                $insert_query = "INSERT INTO `admin`(`name`,`email`,`password`) VALUES(:name,:email,:password)";
-                //$insert_profile = "INSERT INTO `profile`(`name`,`email`) VALUES(:name,:email)";
-                $insert_stmt = $conn->prepare($insert_query);
-                //$insert_profile_stmt = $conn->prepare($insert_profile);
-                // DATA BINDING
-                $insert_stmt->bindValue(':name', htmlspecialchars(strip_tags($name)), PDO::PARAM_STR);
-                $insert_stmt->bindValue(':email', $email, PDO::PARAM_STR);
-                // DATA BINDING FOR PROFILE
-                //$insert_profile_stmt->bindValue(':name', htmlspecialchars(strip_tags($name)), PDO::PARAM_STR);
-                //$insert_profile_stmt->bindValue(':email', $email, PDO::PARAM_STR);
-                // UNCOMMENT TO STORE ENCRYPTED PASSWORD
-                //$insert_stmt->bindValue(':password', password_hash($password, PASSWORD_DEFAULT), PDO::PARAM_STR);
-                $insert_stmt->bindValue(':password', $password, PDO::PARAM_STR);
-
-                $insert_stmt->execute();
-                $insert_profile_stmt->execute();
-                $returnData = msg(1, 201, 'You have successfully registered.');
-
-            endif;
-        } catch (PDOException $e) {
-            $returnData = msg(0, 500, $e->getMessage());
-        }
+        $check_email = "SELECT `email` FROM `admin` WHERE `email`='" . $email . "'";
+        $check_email_stmt = $conn->query($check_email);
+        if (mysqli_num_rows($check_email_stmt)) :
+            $returnData = msg(0, 422, 'This E-mail already in use!');
+        else :
+            $insert_query = "INSERT INTO `admin`(`name`,`email`,`password`) VALUES('" . htmlspecialchars(strip_tags($name)) . "','" . $email . "','" . $password . "')";
+            //$insert_profile = "INSERT INTO `profile`(`name`,`email`) VALUES('" . htmlspecialchars(strip_tags($name)) . "','" . $email . "')";
+            $conn->query($insert_query);
+            //$conn->query($insert_profile);
+            $returnData = msg(1, 201, 'You have successfully registered.');
+        endif;
     endif;
 endif;
 

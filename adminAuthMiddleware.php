@@ -1,10 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: access");
-header("Access-Control-Allow-Methods:  GET, POST");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization,Admin-App-Version, X-Requested-With");
-
+require('appHeaders.php');
 require __DIR__ . '/classes/JwtHandler.php';
 
 class Auth extends JwtHandler
@@ -21,26 +16,6 @@ class Auth extends JwtHandler
         $this->headers = $headers;
     }
 
-    // public function verifyVersion()
-    // {
-    //     $db = parse_ini_file(dirname(__DIR__) . "/DbProperties.ini");
-    //     $versionMatched = false;
-    //     echo($db);
-    //     if ($role == 'ADMIN') {
-    //         if ($db['admin_app_version'] == $admin_app_version) {
-    //             $versionMatched = true;
-    //         }
-    //     } else {
-    //     if ($db['app_version'] == 1.0) {
-    //         $versionMatched = true;
-    //     }
-    //     }
-    //     if (!$versionMatched) {
-    //         return false;
-    //     } else {
-    //         return true;
-    //     }
-    // }
 
     public function isValid()
     {   $db = parse_ini_file(dirname(__DIR__) . "\php-auth-api\DbProperties.ini");
@@ -92,18 +67,18 @@ class Auth extends JwtHandler
     protected function fetchUser($user_id)
     {  
         try {
-            $fetch_user_by_id = "SELECT * FROM `admin` WHERE email=:id";
-            $query_stmt = $this->db->prepare($fetch_user_by_id);
-            $query_stmt->bindValue(':id', $user_id, PDO::PARAM_INT);
-            $query_stmt->execute();
+            $fetch_user_by_id = "SELECT * FROM `admin` WHERE email='".$user_id."'";
+            $query_stmt = mysqli_query($this->db,($fetch_user_by_id));
+           // $query_stmt->bindValue(':id', $user_id, PDO::PARAM_INT);
+            //$query_stmt->execute();
 
-            if ($query_stmt->rowCount()) :
-                return $query_stmt->fetch(PDO::FETCH_ASSOC);
+            if ($query_stmt && mysqli_num_rows($query_stmt)) :
+                return mysqli_fetch_assoc($query_stmt);
             else :
                 return false;
             endif;
-        } catch (PDOException $e) {
-            return null;
+        } catch (Exception $e) {
+            return $e;
         }
     }
 }

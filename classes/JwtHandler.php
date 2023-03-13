@@ -18,10 +18,10 @@ class JwtHandler
         $this->issuedAt = time();
 
         // Token Validity (3600 second = 1hr)
-        $this->expire = $this->issuedAt + 36000;
+        $this->expire = $this->issuedAt + 3600;
 
         // Set your secret or signature
-        $this->jwt_secrect = "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+        $this->jwt_secrect = "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5t";
     }
 
     public function jwtEncodeData($iss, $data)
@@ -47,6 +47,7 @@ class JwtHandler
     {
         try {
             $decode = JWT::decode($jwt_token, $this->jwt_secrect, array('HS256'));
+            //echo($decode->data->user_id);
             return [
                 "data" => $decode->data
             ];

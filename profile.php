@@ -1,10 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: access");
-header("Access-Control-Allow-Methods: POST");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization,App-Version, X-Requested-With");
-
+require('appHeaders.php');
 require __DIR__ . '/classes/Database.php';
 $db_connection = new Database();
 $conn = $db_connection->dbConnection();
@@ -67,23 +62,15 @@ else :
     $tags = trim($data->tags);
     
     try {
-        $insert_query = "UPDATE `profile` SET `name`=:name,`phone`=:phone,`gender`=:gender,`dob`=:dob,`address`=:addr,`city`=:city,`country`=:country,`qualification`=:qualification,`tags`=:tags WHERE `email`=:email";
+        $insert_query = "UPDATE `profile` SET `name`='$name',`phone`='$phone',`gender`='$gender',`dob`='$dob',`address`='$add',`city`='$city',`country`='$country',`qualification`='$qualification',`tags`='$tags' WHERE `email`='$email'";
 
-        $insert_stmt = $conn->prepare($insert_query);
-        $insert_stmt->bindValue(':name', $name, PDO::PARAM_STR);
-        $insert_stmt->bindValue(':email', $email, PDO::PARAM_STR);
-        $insert_stmt->bindValue(':phone', $phone, PDO::PARAM_STR);
-        $insert_stmt->bindValue(':gender', $gender, PDO::PARAM_STR);
-        $insert_stmt->bindValue(':dob', $dob, PDO::PARAM_STR);
-        $insert_stmt->bindValue(':addr', $add, PDO::PARAM_STR);
-        $insert_stmt->bindValue(':city', $city, PDO::PARAM_STR);
-        $insert_stmt->bindValue(':country', $country, PDO::PARAM_STR);
-        $insert_stmt->bindValue(':qualification', $qualification, PDO::PARAM_STR);
-        $insert_stmt->bindValue(':tags', $tags, PDO::PARAM_STR);
-
-        $insert_stmt->execute();
-        $returnData = msg(1, 201, 'Profile Recorded');
-    } catch (PDOException $e) {
+        $stmt = $conn->query($insert_query);
+        if ($stmt) {
+            $returnData = msg(1, 201, 'Profile Recorded');
+        } else {
+            $returnData = msg(0, 500, 'Unable to update profile');
+        }
+    } catch (Exception $e) {
         $returnData = msg(0, 500, $e->getMessage());
     }
 endif;

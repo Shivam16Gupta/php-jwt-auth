@@ -1,10 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: access");
-header("Access-Control-Allow-Methods: POST");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, App-Version,X-Requested-With");
-
+require('appHeaders.php');
 require __DIR__ . '/classes/Database.php';
 
 //CONNECTION SETUP
@@ -26,7 +21,7 @@ function msg($success, $status, $message, $extra = [])
 $returnData=[];
 //echo($data->email);
 //
-if ($_SERVER["REQUEST_METHOD"] != "POST") :
+if ($_SERVER["REQUEST_METHOD"] != "GET") :
 
     $returnData = msg(0, 404, 'Page Not Found!');
 
@@ -35,17 +30,28 @@ else:
     //FETCH QUIZ INFO
     try {
         $fetchQuery = "SELECT * FROM `quizinfo` WHERE host=1 ";
-        $query_stmt = $conn->prepare($fetchQuery);
-        $query_stmt->execute();
-        $returnData = msg(1, 201, 'You have successfully submitted the test.');
-    } catch (PDOException $e) {
+        $query_result = mysqli_query($conn, $fetchQuery);
+        
+        if ($query_result) {
+            $returnData = msg(1, 201, 'Browsed all quizes.');
+            $rows = array();
+            while ($row = mysqli_fetch_assoc($query_result)) {
+                $rows[] = $row;
+            }
+            $returnData = $rows;
+        } else {
+            $returnData = msg(0, 500, mysqli_error($conn));
+        }
+
+    } catch (Exception $e) {
         $returnData = msg(0, 500, $e->getMessage());
     }
-    //CONVERT QUIZ DATA
-    $returnData = json_encode($query_stmt->fetchAll(PDO::FETCH_ASSOC));
-    echo $returnData;
+
 endif;
+
+echo json_encode($returnData);
+
 //CREATE JSON FILE
 $fp = fopen('gallery.json', 'w');
-fwrite($fp, $returnData);
+fwrite($fp, json_encode($returnData));
 fclose($fp);

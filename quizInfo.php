@@ -1,10 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: access");
-header("Access-Control-Allow-Methods: POST");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, App-Version,X-Requested-With");
-
+require('appHeaders.php');
 require __DIR__ . '/classes/Database.php';
 
 //CONNECTION SETUP
@@ -46,14 +41,18 @@ else :
     //FETCH QUIZ INFO
     try {
         $fetchQuery = "SELECT * FROM `quizinfo` WHERE host='1' AND (quizid NOT IN (SELECT quizid FROM `score` WHERE email='" . $email . "'))";
-        $query_stmt = $conn->prepare($fetchQuery);
-        $query_stmt->execute();
+        $query_result = mysqli_query($conn, $fetchQuery);
         $returnData = msg(1, 201, 'You have successfully submitted the test.');
-    } catch (PDOException $e) {
+    } catch (Exception $e) {
         $returnData = msg(0, 500, $e->getMessage());
     }
+
     //CONVERT QUIZ DATA
-    $returnData = json_encode($query_stmt->fetchAll(PDO::FETCH_ASSOC));
+    $quiz_data = array();
+    while ($row = mysqli_fetch_assoc($query_result)) {
+        $quiz_data[] = $row;
+    }
+    $returnData = json_encode($quiz_data);
     echo $returnData;
 endif;
 //CREATE JSON FILE

@@ -1,10 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: access");
-header("Access-Control-Allow-Methods: POST");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization,App-Version, X-Requested-With");
-
+require('appHeaders.php');
 require __DIR__.'/classes/Database.php';
 
 //CONNECTION SETUP
@@ -18,18 +13,18 @@ $req_quiz=json_decode(file_get_contents("php://input"));
 $email=trim($req_quiz->email);
 
 //FETCH QUIZ DATA
-$fetchQuery="SELECT * FROM `score` LEFT JOIN `quizinfo` on score.quizid=quizinfo.quizid LEFT JOIN `performance` on quizinfo.quizid=performance.quizid WHERE score.email='".$email."' and quizinfo.showresult='1'";
-//$fetchQuery="SELECT * FROM (SELECt * FROM `score` s INNER JOIN `performance` p on s.email=p.email) WHERE email='".$email."'  AND quizid in (SELECT * FROM `quizinfo` WHERE showresult='1') ";
-$query_stmt=$conn->prepare($fetchQuery);
-//$query_stmt->bindValue(':quizid',1,PDO::PARAM_INT);
-$query_stmt->execute();
+$fetchQuery="SELECT * FROM `quizinfo` LEFT JOIN `score` on score.quizid=quizinfo.quizid LEFT JOIN `performance` on score.email=performance.email WHERE score.email='".$email."' and quizinfo.showresult='1'";
+$query_result = mysqli_query($conn, $fetchQuery);
+$result_array = array();
+while($row = mysqli_fetch_assoc($query_result)) {
+    $result_array[] = $row;
+}
 
 //CONVERT QUIZ DATA
-$returnData=json_encode($query_stmt->fetchAll(PDO::FETCH_ASSOC));
+$returnData=json_encode($result_array);
 echo $returnData;
 
 //CREATE JSON FILE
 $fp=fopen('score.json','w');
 fwrite($fp, $returnData);
 fclose($fp);
-?>
