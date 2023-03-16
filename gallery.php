@@ -1,5 +1,6 @@
 <?php
 require('appHeaders.php');
+//header("Content-Type: application/json; charset=UTF-8");
 require __DIR__ . '/classes/Database.php';
 
 //CONNECTION SETUP
@@ -20,8 +21,9 @@ function msg($success, $status, $message, $extra = [])
 
 $returnData=[];
 //echo($data->email);
-//
-if ($_SERVER["REQUEST_METHOD"] != "GET") :
+//echo(var_dump($_POST));
+$par=($_POST['search']);
+if ($_SERVER["REQUEST_METHOD"] != "POST") :
 
     $returnData = msg(0, 404, 'Page Not Found!');
 
@@ -29,14 +31,20 @@ else:
     
     //FETCH QUIZ INFO
     try {
-        $fetchQuery = "SELECT * FROM `quizinfo` WHERE host=1 ";
+        $fetchQuery = "SELECT * FROM `quizinfo` WHERE host=1 and tags like '$par'";
+        //echo($fetchQuery);
         $query_result = mysqli_query($conn, $fetchQuery);
         
         if ($query_result) {
             $returnData = msg(1, 201, 'Browsed all quizes.');
             $rows = array();
             while ($row = mysqli_fetch_assoc($query_result)) {
+                if(file_exists($_SERVER['DOCUMENT_ROOT'].'/php-auth-api'.$row['banner'])){
+                    $row['banner'] = base64_encode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/php-auth-api'.$row['banner']));
+                    //echo json_encode(base64_encode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/php-auth-api'.$row['banner'])));
+                }
                 $rows[] = $row;
+                
             }
             $returnData = $rows;
         } else {
@@ -48,7 +56,7 @@ else:
     }
 
 endif;
-
+//header("Content-Type: image/*");
 echo json_encode($returnData);
 
 //CREATE JSON FILE

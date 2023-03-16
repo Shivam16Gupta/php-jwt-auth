@@ -14,25 +14,25 @@ function msg($success, $status, $message, $extra = [])
 }
 
 // DATA FORM REQUEST
-$data = json_decode(file_get_contents("php://input"));
+//$data = json_decode(file_get_contents("php://input"));
 $returnData = [];
-
+$name = trim($_POST['Name']);
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
 if ($_SERVER["REQUEST_METHOD"] != "POST") :
     $returnData = msg(0, 404, 'Page Not Found!');
 elseif (
-    !isset($data->name)
-    || !isset($data->email)
-    || !isset($data->password)
-    || empty(trim($data->name))
-    || empty(trim($data->email))
-    || empty(trim($data->password))
+    !isset($name)
+    || !isset($email)
+    || !isset($password)
+    || empty(trim($name))
+    || empty(trim($email))
+    || empty(trim($password))
 ) :
     $fields = ['fields' => ['name', 'email', 'password']];
     $returnData = msg(0, 422, 'Please Fill in all Required Fields!', $fields);
 else :
-    $name = trim($data->name);
-    $email = trim($data->email);
-    $password = trim($data->password);
+    
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) :
         $returnData = msg(0, 422, 'Invalid Email Address!');
     elseif (strlen($password) < 8) :

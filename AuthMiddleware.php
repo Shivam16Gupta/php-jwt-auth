@@ -19,14 +19,14 @@ class Auth extends JwtHandler
 
     public function isValid()
     {
-        $db = parse_ini_file(dirname(__DIR__) . "\php-auth-api\DbProperties.ini");
+        $db = parse_ini_file(dirname(__DIR__) . "/php-auth-api/DbProperties.ini");
 
         if (array_key_exists('Authorization', $this->headers) && preg_match('/Bearer\s(\S+)/', $this->headers['Authorization'], $matches)) {
 
-            if(array_key_exists('App-Version', $this->headers)){
+            if(array_key_exists('App', $this->headers)){
                 forEach($this->headers as $name=>$value)
                 {
-                    if (strtoupper($name) == "APP-VERSION") {
+                    if (strtoupper($name) == "APP") {
                         $this->ver =  $value;
                       }
                 }

@@ -22,11 +22,11 @@ class Auth extends JwtHandler
 
         if (array_key_exists('Authorization', $this->headers) && preg_match('/Bearer\s(\S+)/', $this->headers['Authorization'], $matches)) {
             
-            if(array_key_exists('Admin-App-Version', $this->headers)){
+            if(array_key_exists('AdminApp', $this->headers)){
 
                 forEach($this->headers as $name=>$value)
                 {
-                    if (strtoupper($name) == "ADMIN-APP-VERSION") {
+                    if (strtoupper($name) == "ADMINAPP") {
                         $this->ver =  $value;
                       }
                 }
