@@ -21,6 +21,7 @@ $time = date("H:i:s");
 
 // DATA FORM REQUEST
 $data = json_decode(file_get_contents("php://input"));
+
 $returnData = [];
 //echo(json_encode($data));
 // if ($_SERVER["REQUEST_METHOD"] != "POST" || $_SERVER["REQUEST_METHOD"] != "OPTIONS") :
@@ -37,9 +38,37 @@ if (
 else :
     $quizid = trim($data->quizid);
     $email = trim($data->email);
-    $response = json_encode($data->response);
-    $response=addslashes($response);
-    //echo(json_encode($data));
+    $response = ($data->response);
+    $pm=($data->pmarks);
+    $nm=($data->nmarks);
+    //fetch answer sheet
+    $answer_sheet_query = "SELECT `questionid`,`answer` FROM `quizbank` WHERE `quizid` = '$quizid'";
+    $answer_sheet_result = mysqli_query($conn,$answer_sheet_query);
+    $score=0;
+    //echo(json_encode($response));
+    foreach($answer_sheet_result as $row)
+    {
+        //echo(json_encode($answer_sheet_result));
+        //echo($row['questionid'].'-'.$row['answer']);
+        foreach($response as $value){
+            if($value->questionid==$row['questionid'] && $value->status=='answered')
+            {
+                if($value->status=='answered' && $value->selected==$row['answer'] )
+                {$score+=$pm;}
+                else
+                {$score-=$nm;}
+                echo($row['questionid'].$row['answer'].$value->selected.$score.'//');
+            }
+            //echo($row['questionid'].$row['answer'].$value->selected.$score);
+        }
+        
+        
+    }
+    $response=addslashes(json_encode($response));
+    //store score in performance table
+    $insert_score="INSERT INTO `performance` (`quizid`,`email`,`score`) VALUES ('$quizid','$email','$score')";
+    $exec_score = mysqli_query($conn,$insert_score);
+    //store record in score table
     $insert_query = "INSERT INTO `score` (`quizid`,`email`,`data`,`date`,`time`,`ip`) VALUES('$quizid','$email','$response','$date','$time','$ip_address')";
     $insert_result = mysqli_query($conn,$insert_query);
 

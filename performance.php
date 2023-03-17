@@ -25,10 +25,10 @@ elseif (
     ||!isset($data->unattempted)
     || !isset($data->review)
     || !isset($data->answered)
-    || !isset($data->score)
+    //|| !isset($data->score)
     ||empty($data->email)
 ) :
-    $fields = ['fields' => ['quizid','email','unattempted','review', 'answered','score']];
+    $fields = ['fields' => ['quizid','email','unattempted','review', 'answered']];
     $returnData = msg(0, 422, 'Please Fill in all Required Fields!', $fields);
 else :
     $quizid = trim($data->quizid);
@@ -36,10 +36,9 @@ else :
     $unattempted = trim($data->unattempted);
     $review = trim($data->review);
     $answered = trim($data->answered);
-    $score = trim($data->score);
+    //$score = trim($data->score);
     
-    $insert_query = "INSERT INTO `performance`(`quizid`,`email`,`answered`,`review`,`unattempted`,`score`) 
-    VALUES('$quizid','$email','$answered','$review','$unattempted','$score')";
+    $insert_query = "UPDATE `performance` SET `answered`='$answered',`review`='$review',`unattempted`='$unattempted' WHERE `quizid`='$quizid' AND `email`='$email'";
     
     if(mysqli_query($conn, $insert_query)){
         $returnData = msg(1, 201, 'Performace Recorded');
